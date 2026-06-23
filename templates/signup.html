@@ -14,17 +14,17 @@
     <form method="POST">
         <div class="mb-3">
         <label class="form-label">You are a</label>
-        <select name="role" id="roleSelect" class="form-select" required>
+        <select name="role" id="roleSelect" class="form-select" onchange="toggleFields()" required>
             <option value="student">Student</option>
             <option value="company">Company</option>
         </select>
         </div>
 
+
         <div class="mb-3">
         <label class="form-label">Name</label>
         <input type="name" name="name" class="form-control" placeholder="name" required>
         </div>
-
         <div class="mb-3">
         <label class="form-label">Email</label>
         <input type="email" name="email" class="form-control" placeholder="email pls" required>
@@ -33,11 +33,42 @@
         <label class="form-label">Password</label>
         <input type="password" name="password" class="form-control" required>
         </div>
-        <button type="submit" class="btn btn-success">submit</button>
-        
+
+
+        <div id="StudentFields">
+            <div class="mb-3">
+                <label class="phone">Phone Number</label>
+                <input type="text" name="number" class="form-control">
+            </div>
+        </div>
+            <div id="CompanyField" style="display:none;">
+            <!-- <div class="mb-3">
+                <label class="form-label">Company Name</label>
+                <input type="text" name="company_name"  class="form-control">
+            </div> -->
+            <div class="mb-3">
+                <label class="form-label">Hr Contact</label>
+                <input type="text" name="hr_contact"  class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Company Website</label>
+                <input type="text" name="website"  class="form-control">
+            </div>
+            <div class="form-text mb-3"> You will be able to signin only after admin approves          
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Sign Up</button>
     </form>
     </div>
     </div>
 </div>
+<script>
+    function toggleFields(){
+        var role=document.getElementById('roleSelect').value;
+        document.getElementById('StudentFields').style.display=role=="student"?'block':'none';
+        document.getElementById('CompanyField').style.display=role=="company"?'block':'none';
+
+    }
+</script>
 
 {% endblock %}

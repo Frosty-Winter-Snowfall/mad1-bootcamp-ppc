@@ -22,16 +22,34 @@ class User(db.Model):
     email=db.Column(db.String(100), unique=True,nullable=False)
     password_hash=db.Column(db.String(200),nullable=False)
     role=db.Column(db.String(20), nullable=False)
-    # resume_path=db.Column(db.String(300))
-    # is_blacklisted=db.Column(db.Boolean,default='False')
-    # created_at=db.Column(db.DateTime,default=datetime.now)
+
+    resume_path=db.Column(db.String(300))
+    phone=db.Column(db.String(20))
+    company_name=db.Column(db.String(200))
+    hr_contact=db.Column(db.String(200))
+    website=db.Column(db.String(200))
+    approval_status=db.Column(db.String(20),default='pending')
+    is_blacklisted=db.Column(db.Boolean,default=False)
+
+    created_at=db.Column(db.DateTime,default=datetime.now)
 
     def set_password(self,raw):
         self.password_hash=generate_password_hash(raw)
     def check_password(self,raw):
         return check_password_hash(self.password_hash, raw)
 
+# admin
+def create_admin():
+    if not User.query.filter_by(role='admin').first():
+        admin=User(name='Admin',email='admin@gmail.com',role='admin',approval_status='approved')
+        admin.set_password('1234')
+        db.session.add(admin)
+        db.session.commit()
+        print('Admin created,admin@gmail.com,1234')
 
+
+
+#login/signup/logout
 
 @app.route("/")
 def index():
@@ -46,9 +64,23 @@ def login():
         print(password)
         user=User.query.filter_by(email=email).first()
         if not email or not password:
-            return render_template('index.html')
+            return render_template('login.html',error='Fill all fields')
+        if not user or not user.check_password(password):
+            return render_template('login.html',error='Your password is wrong')
+        if user.role=='company' and user.approval_status!='approved':
+            return render_template('login.html',error='Your account is pending approval')
         if user.is_blacklisted:
-            return render_template('index.html')
+            return render_template('login.html',error='Your account is blacklisted')
+        session['user_id']=user.id
+        session['role']=user.role
+        session['name']=user.name
+        if user.role=='admin':
+            return redirect(url_for('admin_dash'))
+        elif user.role=='company':
+            return redirect(url_for('company_dash'))
+        else:
+            return redirect(url_for('student_dashboard'))
+
     return render_template("login.html")
 
 @app.route("/signup",methods=['GET','POST'])
@@ -72,17 +104,59 @@ def signup():
         print(user)
 
         if role=='student':
-            print("hi student")
+            user.phone=request.form.get('number')
+
         if role=='company':
-            print("hi company")
+            # print("hi company")
+            user.company_name=request.form.get('company_name',' ').strip()
+            user.hr_contact=request.form.get('hr_contact',' ').strip()
+            user.website=request.form.get('website',' ').strip()
+
         db.session.add(user)
         db.session.commit()
         return redirect("/")
     return render_template('signup.html')
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+
+
+# admin dashboard
+
+@app.route("/admin_dashboard")
+def admin_dashboard():
+    return render_template('admin_dash.html')
+
+
+
+
+# company dashboard
+@app.route("/company_dashboard")
+def company_dashboard():
+    return render_template('company_dash.html')
+
+
+
+# student dashboard
+
+@app.route("/student_dashboard")
+def student_dashboard():
+    return render_template('student_dash.html')
+
+
+
+
+
+
+
+# run the app
 
 with app.app_context():
     db.create_all()
+    create_admin()
 
 if __name__=='__main__':
     app.run(debug=True)
