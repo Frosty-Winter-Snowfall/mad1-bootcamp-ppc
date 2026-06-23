@@ -75,7 +75,7 @@ def login():
         session['role']=user.role
         session['name']=user.name
         if user.role=='admin':
-            return redirect(url_for('admin_dash'))
+            return redirect(url_for('admin_dashboard'))
         elif user.role=='company':
             return redirect(url_for('company_dash'))
         else:
@@ -123,12 +123,13 @@ def logout():
     return redirect(url_for('index'))
 
 
-
 # admin dashboard
 
 @app.route("/admin_dashboard")
 def admin_dashboard():
-    return render_template('admin_dash.html')
+    student=User.query.filter_by(role="student").count()
+    company=User.query.filter_by(role="company").count()
+    return render_template('admin_dash.html',total_students=student,total_companies=company)
 
 
 
