@@ -38,6 +38,28 @@ class User(db.Model):
     def check_password(self,raw):
         return check_password_hash(self.password_hash, raw)
 
+class Drive(db.Model):
+    id=db.Column(db.Integer,primary_key=True)
+    company_id=db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
+    job_title=db.Column(db.String(200),nullable=False)
+    job_description=db.Column(db.String(200))
+    eligibility=db.Column(db.String(200))
+    application_deadline=db.Column(db.Date)
+    status=db.Column(db.String(20),default='pending')
+
+    company=db.relationship('User')
+    application=db.relationship('Application',backref='drive',cascade='all,delete-orphan')
+
+class Application(db.Model):
+    id=db.Column(db.Integer,primary_key=True)
+    student_id=db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
+    drive_id=db.Column(db.Integer,db.ForeignKey('drive.id'),nullable=False)
+    application_date=db.Column(db.DateTime,default=datetime.now)
+    status=db.Column(db.String(20),default='Applied')
+
+    student=db.relationship('User')
+
+
 # admin
 def create_admin():
     if not User.query.filter_by(role='admin').first():
@@ -127,14 +149,44 @@ def logout():
 
 @app.route("/admin_dashboard")
 def admin_dashboard():
-    student=User.query.filter_by(role="student").count()
-    company=User.query.filter_by(role="company").count()
-    return render_template('admin_dash.html',total_students=student,total_companies=company)
+    if session.get('role')!="admin":
+        return render_template('index.html')
+    total_student=User.query.filter_by(role="student").count()
+    total_company=User.query.filter_by(role="company").count()
+    # total_place=DB.query.count()
+    # total_app=DB.query..count()
+    pending_comp=User.query.filter_by(role="company",approval_status='pending').all()
+
+    all_students=User.query.filter_by(role="student").all()
+
+    return render_template('admin_dash.html'
+                           ,total_students=total_student,
+                           total_companies=total_company,
+                           pending_comp=pending_comp,
+                           all_students=all_students
+                           )
+
+@app.route('/admin/approvecompany/<int:company_id>') 
+def approve_comp(company_id):
+    if session.get('role')!='admin':
+        return redirect(url_for('index'))
+    company=User.query.get_or_404(company_id)
+    company.approval_status='approved'
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/rejectcompany/<int:company_id>') 
+def reject_comp(company_id):
+    if session.get('role')!='admin':
+        return redirect(url_for('index'))
+    company=User.query.get_or_404(company_id)
+    company.approval_status='rejected'
+    company.is_blacklisted='True'
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
 
 
-
-
-# company dashboard
+# compandashboard
 @app.route("/company_dashboard")
 def company_dashboard():
     return render_template('company_dash.html')

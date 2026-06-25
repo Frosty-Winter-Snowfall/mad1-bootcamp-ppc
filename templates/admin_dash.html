@@ -4,17 +4,66 @@
 
 <h2>Admin Dashboard</h2>
 
-<div>
-    <h6>Students</h6>
+<div class="row g-3 mt-2">
+    <div class="col-md-3">
+        <div class="card text-bg-primary p-3">
+    <h6>Total Students</h6>
     <h2>{{total_students}}</h2>
 </div>
+</div>
 
-<div>
+    <div class="col-md-3">
+        <div class="card text-bg-success p-3">
     <h6>Company</h6>
     <h2>{{total_companies}}</h2>
 </div>
+</div>
 
+    <div class="col-md-3">
+        <div class="card text-bg-warning p-3">
+    <h6>Placement</h6>
+    <h2>{{total_place}}</h2>
+</div>
+</div>
 
+    <div class="col-md-3">
+        <div class="card text-bg-danger p-3">
+    <h6>Applications</h6>
+    <h2>{{total_app}}</h2>
+</div>
+</div>
+</div>
+
+<h4 class="section-title">Pending Companies</h4>
+<div class="table-responsive">
+    <table class="table table-bordered bg-light">
+        <thead><tr>
+            <th>Name of Company</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr></thead>
+        <tbody>
+            {% for c in pending_comp %}
+            <tr>
+                <td>{{c.name}}</td>
+                <td>{{c.email}}</td>
+                <td>
+                    <form method="POST" action="{{url_for('is_approved',company_id=c.id)}}" class="d-inline">
+                        <button class="btn btn-success">Approve</button>
+                    </form>
+                    <form method="POST" action="{{url_for('is_rejected',company_id=c.id)}}" class="d-inline">
+                        <button class="btn btn-danger">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td>
+                No pending approvals
+            </td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 
 {% endblock %}
