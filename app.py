@@ -1,5 +1,6 @@
 from flask import Flask,render_template,request,redirect,session,url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 from datetime import datetime,timedelta
 from werkzeug.security import check_password_hash,generate_password_hash
 import os
@@ -147,26 +148,49 @@ def logout():
 
 # admin dashboard
 
-@app.route("/admin_dashboard")
+@app.route("/admin_dashboard",methods=['GET','POST'])
 def admin_dashboard():
     if session.get('role')!="admin":
         return render_template('index.html')
     total_student=User.query.filter_by(role="student").count()
     total_company=User.query.filter_by(role="company").count()
-    # total_place=DB.query.count()
-    # total_app=DB.query..count()
-    pending_comp=User.query.filter_by(role="company",approval_status='pending').all()
+    total_place=Drive.query.count()
+    total_app=Application.query.count()
 
+
+    pending_comp=User.query.filter_by(role="company",approval_status='pending').all()
     all_students=User.query.filter_by(role="student").all()
+    all_companies=User.query.filter_by(role="company").all()
+    all_drives=User.query.filter_by(role="company").all()
+
+    search_query=request.args.get('q','').strip()
+    search_results_stud=[]
+    search_results_comp=[]
+    if search_query:
+        like=f'%{search_query}%'
+        search_results_stud=User.query.filter(
+            User.role=='student',
+            or_(User.name.like(like), User.email.like(like))).all()
+        search_results_comp=User.query.filter(
+            User.role=='company',
+            or_(User.name.like(like), User.company_name.like(like))).all()
+
 
     return render_template('admin_dash.html'
                            ,total_students=total_student,
                            total_companies=total_company,
+                           total_place=total_place,
+                           total_app=total_app,
+
                            pending_comp=pending_comp,
-                           all_students=all_students
+                           all_students=all_students,
+                           all_companies=all_companies,
+                           all_drives=all_drives,
+                           search_results_stud=search_results_stud,
+                           search_results_comp=search_results_comp
                            )
 
-@app.route('/admin/approvecompany/<int:company_id>') 
+@app.route('/admin/approvecompany/<int:company_id>',methods=['GET','POST']) 
 def approve_comp(company_id):
     if session.get('role')!='admin':
         return redirect(url_for('index'))
@@ -175,15 +199,25 @@ def approve_comp(company_id):
     db.session.commit()
     return redirect(url_for('admin_dashboard'))
 
-@app.route('/admin/rejectcompany/<int:company_id>') 
+@app.route('/admin/rejectcompany/<int:company_id>',methods=['GET','POST']) 
 def reject_comp(company_id):
     if session.get('role')!='admin':
         return redirect(url_for('index'))
     company=User.query.get_or_404(company_id)
     company.approval_status='rejected'
-    company.is_blacklisted='True'
+    # company.is_blacklisted='True'
     db.session.commit()
     return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/studentblacklisted/<int:student_id>',methods=['GET','POST'])
+def blacklists(student_id):
+        if session.get('role')!='admin':
+            return redirect(url_for('index'))
+        student=User.query.get_or_404(student_id)
+        student.is_blacklisted=not student.is_blacklisted
+
+        db.session.commit()
+        return redirect(url_for('admin_dashboard'))
 
 
 # compandashboard

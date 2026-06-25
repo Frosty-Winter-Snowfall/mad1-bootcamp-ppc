@@ -4,6 +4,8 @@
 
 <h2>Admin Dashboard</h2>
 
+
+<!-- stats -->
 <div class="row g-3 mt-2">
     <div class="col-md-3">
         <div class="card text-bg-primary p-3">
@@ -11,21 +13,18 @@
     <h2>{{total_students}}</h2>
 </div>
 </div>
-
     <div class="col-md-3">
         <div class="card text-bg-success p-3">
     <h6>Company</h6>
     <h2>{{total_companies}}</h2>
 </div>
 </div>
-
     <div class="col-md-3">
         <div class="card text-bg-warning p-3">
     <h6>Placement</h6>
     <h2>{{total_place}}</h2>
 </div>
 </div>
-
     <div class="col-md-3">
         <div class="card text-bg-danger p-3">
     <h6>Applications</h6>
@@ -34,6 +33,8 @@
 </div>
 </div>
 
+
+<!-- pending companies -->
 <h4 class="section-title">Pending Companies</h4>
 <div class="table-responsive">
     <table class="table table-bordered bg-light">
@@ -41,6 +42,7 @@
             <th>Name of Company</th>
             <th>Email</th>
             <th>Action</th>
+            
         </tr></thead>
         <tbody>
             {% for c in pending_comp %}
@@ -48,10 +50,10 @@
                 <td>{{c.name}}</td>
                 <td>{{c.email}}</td>
                 <td>
-                    <form method="POST" action="{{url_for('is_approved',company_id=c.id)}}" class="d-inline">
+                    <form method="POST" action="{{url_for('approve_comp',company_id=c.id)}}" class="d-inline">
                         <button class="btn btn-success">Approve</button>
                     </form>
-                    <form method="POST" action="{{url_for('is_rejected',company_id=c.id)}}" class="d-inline">
+                    <form method="POST" action="{{url_for('reject_comp',company_id=c.id)}}" class="d-inline">
                         <button class="btn btn-danger">Reject</button>
                     </form>
                 </td>
@@ -66,4 +68,166 @@
 </div>
 
 
+<!-- pending placements -->
+<h4 class="section-title">Pending Drives</h4>
+<div class="table-responsive">
+    <table class="table table-bordered bg-light">
+        <thead><tr>
+            <th>Drive Title</th>
+            <th>Company</th>
+            <th>Deadline</th>
+            <th>Action</th>
+            
+        </tr></thead>
+        <tbody>
+            {% for c in pending_drive %}
+            <tr>
+                <td>{{c.job_title}}</td>
+                <td>{{c.company.company_name}}</td>
+                <td>{{c.application_deadline}}</td>
+                <td>
+                    <form method="POST" action="{{url_for('approve_drive',drive_id=c.id)}}" class="d-inline">
+                        <button class="btn btn-success">Approve</button>
+                    </form>
+                    <form method="POST" action="{{url_for('reject_drive',drive_id=c.id)}}" class="d-inline">
+                        <button class="btn btn-danger">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td>
+                No pending approvals
+            </td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<h4 class="section-title">Search</h4>
+<form methods="GET" class="d-flex mb-3" style="max-width:400px;">
+    <input type="text" name="q" class="form-control me-2" placeholder="Search by name/id" value="{{search_query}}">
+    <button class="btn btn-success">Search</button>
+</form>
+
+{% if search_query %}
+<p class="text-muted">Results for "{{ search_query }}"</p>
+<div class="table-responsive">
+    <table class="table table-bordered bg-light">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in search_results_stud %}
+                <tr>
+                    <td>Student</td>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.email }}</td>
+                </tr>
+                {% endfor %}
+                {% for c in search_results_comp %}
+                <tr>
+                    <td>Company</td>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.email }}</td>
+                </tr>
+                {% endfor %}
+                {% if not search_results_stud and not search_results_comp %}
+                <tr><td>
+                    No searches found
+                </td></tr>
+                {% endif %}
+            </tbody>
+    </table>
+    </div>
+{% endif %}
+
+<!-- all students -->
+<h4 class="section-title">All Students</h4>
+<div class="table-responsive">
+    <table class="table table-bordered bg-light">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in all_students %}
+            <tr>
+                <td>{{s.name}}</td>
+                <td>{{s.email}}</td>
+                <td>
+                    <form method="POST" action="{{url_for("blacklists",student_id=s.id)}}">
+                        <button class="btn btn-sm {{'btn-outline-success' if s.is_blacklisted else 'btn-outline-danger'}}">
+                            {{'Reinstate' if s.is_blacklisted else 'Blacklist'}}
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>No students</tr>
+            {% endfor %}
+        </tbody>
+</table>
+</div>
+
+
+
+<!-- companies -->
+<h4 class="section-title">All Companies</h4>
+<div class="table-responsive">
+    <table class="table table-bordered bg-light">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>HR Contact</th>
+                <th>Website</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in all_companies %}
+            <tr>
+                <td>{{s.name}}</td>
+                <td>{{s.email}}</td>
+                <td>{{s.website}}</td>
+                <td>{{s.hr_contact}}</td>
+            </tr>
+            {% else %}
+            <tr>No Companies</tr>
+            {% endfor %}
+        </tbody>
+</table>
+</div>
+
+
+<h4 class="section-title">All Drives</h4>
+<div class="table-responsive">
+    <table class="table table-bordered bg-light">
+        <thead>
+            <tr>
+                <th>Company Name</th>
+                <th>Job Title</th>
+                <th>Application Deadline</th>      
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in all_drives %}
+            <tr>
+                <td>{{s.name}}</td>
+                <td>{{s.job_title}}</td>
+                <!-- <td>{{s.name}}</td> -->
+                <td>{{s.application_deadline}}</td>
+            </tr>
+            {% else %}
+            <tr>No Drives</tr>
+            {% endfor %}
+        </tbody>
+</table>
+</div>
 {% endblock %}
