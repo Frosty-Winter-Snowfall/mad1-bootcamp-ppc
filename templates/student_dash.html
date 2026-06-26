@@ -1,7 +1,87 @@
 {% extends 'base.html' %}
-{% block title %}Login{% endblock %}
+{% block title %}Student Dashboard{% endblock %}
 {% block content %}
 
-<p>student hi</p>
+<h2>Welcome {{ student.name }}</h2>
+<div class="card p-3 mb-4">
+    <form method="POST" action="{{ url_for('edit_profile') }}">
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="name" name="name" class="form-control" value="{{student.name}}" required>
+        </div>
+            <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input type="number" name="phone" class="form-control" value="{{student.phone}}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Resume(PDF)</label>
+            <input type="file" name="resume" class="form-control">
+        </div>
+        {% if student.resume_path %}
+        <p class="mt-3">
+            Current Resume
+            <a href="{{url_for('uploded_file',file=student.resume_path)}}">{{Student.resume_path}}</a>
+        </p>
+        {% endif %}
+        <button class="btn btn-success">Save Changes</button>
+    </form>
+</div>
+
+<h4 class="section-title">Placement Drives</h4>
+<div class="row">
+    {% for d in approved_drives %}
+    <div class="col-md-3">
+        <div class="card p-3 h-100">
+            <h5>{{d.title}}</h5>
+            <p class="text-muted mb-1">{{d.company.company_name}}</p>
+            <p class="text-muted mb-1">{{d.job_description}}</p>
+            <p class="text-muted mb-1">{{d.eligibility_criteria}}</p>
+            <p class="text-muted mb-1">{{d.application_deadline}}</p>
+            <form method="POST" action="{{url_for("apply_drive",drive_id=drive.id)}}">
+                <button class="btn btn-primary" {% if drive.id in applied_ids %}disabled{%endif%}>
+                    {{'Applied' if drive.id in applied_ids else 'Apply Now'}}
+                </button>
+            </form>
+        </div>
+    </div>
+{%else%}
+<p class="text-muted">No drrives rn</p>
+
+{% endfor %}
+</div>
+
+<h4 class="section-title">Placement Drives</h4>
+<div class="table-responsive">
+    <table class="table table-bordered bg-white">
+        <thead>
+            <tr>
+                <th>Job Title</th>
+                <th>Company</th>
+                <th>
+                    Applied
+                </th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in applications %}
+            <tr>
+                <td>{{a.drive.job_title}}</td>
+                <td>{{a.drive.company.company_name}}</td>
+                <td>{{a.application_date}}</td>
+                <td>
+                    <span class="badge {% if a.status=='Selected' %}bg-success{%elif a.status=='Rejected' %}bg-danger{% elif a.status=='Shortlisted' %}bg-warning{% else %}bg-secondary{%endif%}">{{a.status}}</span></td>
+                    
+            </tr>
+            {% else %}
+            <p>No applications</p>
+
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</div>
+
 
 {% endblock %}

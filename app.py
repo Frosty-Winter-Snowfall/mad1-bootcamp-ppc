@@ -1,8 +1,9 @@
-from flask import Flask,render_template,request,redirect,session,url_for
+from flask import Flask,render_template,request,redirect,session,url_for,send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 from datetime import datetime,timedelta
 from werkzeug.security import check_password_hash,generate_password_hash
+from werkzeug.utils import secure_filename
 import os
 
 
@@ -70,6 +71,10 @@ def create_admin():
         db.session.commit()
         print('Admin created,admin@gmail.com,1234')
 
+def logged_in():
+    if 'user_id' in session:
+        return User.query.get(session['user_id'])
+    return None
 
 
 #login/signup/logout
@@ -186,6 +191,7 @@ def admin_dashboard():
                            all_students=all_students,
                            all_companies=all_companies,
                            all_drives=all_drives,
+                           search_query=search_query,
                            search_results_stud=search_results_stud,
                            search_results_comp=search_results_comp
                            )
@@ -196,6 +202,8 @@ def approve_comp(company_id):
         return redirect(url_for('index'))
     company=User.query.get_or_404(company_id)
     company.approval_status='approved'
+    # drive=Drive.query.filter_by(status='pending')
+    # drive.status='approved'
     db.session.commit()
     return redirect(url_for('admin_dashboard'))
 
@@ -220,7 +228,7 @@ def blacklists(student_id):
         return redirect(url_for('admin_dashboard'))
 
 
-# compandashboard
+# companydashboard
 @app.route("/company_dashboard")
 def company_dashboard():
     return render_template('company_dash.html')
@@ -231,11 +239,53 @@ def company_dashboard():
 
 @app.route("/student_dashboard")
 def student_dashboard():
-    return render_template('student_dash.html')
+    if session.get('role')!="student":
+        return render_template('index.html')
+    stud=logged_in()
+    approved_drives=Drive.query.filter_by(status='approved').all()
+    applications=Application.query.filter_by(student_id=stud.id).all()
+    applied_drive=[a.drive.id for a in applications]
+    return render_template('student_dash.html',student=stud,
+                           approved_drives=approved_drives,
+                           applications=applications,
+                           applied_drive=applied_drive)
 
 
+@app.route('/student/drive/<int:drive_id>/apply',methods=['GET','POST'])
+def apply_drive(drive_id):
+    if session.get('role')!="student":
+        return render_template('index.html')
+    stud=logged_in()
+    drive=Drive.query.get_or_404(drive_id)
+    if drive.status!='approved':
+        return redirect(url_for('student_dashboard'))
+    exist=Application.query.filter_by(student_id=stud.id,drive_id=drive.id).first()
+    if exist:
+        return redirect(url_for('student_dashboard'))
+    application=Application(student_id=stud.id,drive_id=drive.id,status='Applied') 
+    db.session.add(application)
+    db.session.commit()
+    return redirect(url_for('student_dashboard'))
 
 
+@app.route("/edit_profile",methods=['GET','POST'])
+def edit_profile():
+    if session.get('role')!='student':
+        return redirect(url_for('index'))
+    stud=logged_in()
+    stud.name=request.form.get('name','').strip()
+    stud.phone=request.form.get('phone','').strip()
+    resume=request.files.get('resume')
+    if resume and resume.filename:
+        filename=secure_filename(f"user_{stud.id}_{resume.filename}")
+        filepath=os.path.join(app.config['UPLOAD_FOLDER'],filename)
+        resume.save(filepath)
+    db.session.commit()
+    return redirect(url_for('student_dashboard'))
+
+@app.route('/uploads/<filename>')
+def uploded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 
