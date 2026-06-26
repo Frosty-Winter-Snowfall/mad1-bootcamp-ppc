@@ -276,10 +276,13 @@ def edit_profile():
     stud.name=request.form.get('name','').strip()
     stud.phone=request.form.get('phone','').strip()
     resume=request.files.get('resume')
+    print(resume)
     if resume and resume.filename:
+        print(resume.filename)
         filename=secure_filename(f"user_{stud.id}_{resume.filename}")
         filepath=os.path.join(app.config['UPLOAD_FOLDER'],filename)
         resume.save(filepath)
+        stud.resume_path=filename
     db.session.commit()
     return redirect(url_for('student_dashboard'))
 
