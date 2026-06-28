@@ -1,2 +1,25 @@
-for venv:
-python
+for activating venv:
+python -m venv venv
+Scripts\Activate\venv
+
+installing via req.txt:
+pip install -r requirements.txt
+
+run:
+python app.py
+
+
+before submission:
+check the folder structure:  your roll-->main folder--->all codes
+zip, unzip 
+create the project report, video upload to drive give access to everyone
+
+ALWAYS DO VALIDITY BEFORER SUBMISSION (grey button beside purple button of submission)
+
+always download and check multiple times before and after submission if everything is working
+
+after submission:
+download submission-->open files-->unzip-->open folder-->code .
+
+
+:)

@@ -6,9 +6,6 @@ from werkzeug.security import check_password_hash,generate_password_hash
 from werkzeug.utils import secure_filename
 import os
 
-
-
-
 app=Flask(__name__)
 app.config['SECRET_KEY']="pass"
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///placement.db'
