@@ -33,13 +33,15 @@
     <div class="col-md-3">
         <div class="card p-3 h-100">
             <h5>{{d.title}}</h5>
-            <p class="text-muted mb-1">{{d.company.company_name}}</p>
+            <b><p class="text-muted mb-1">{{d.job_title}}</p></b>
             <p class="text-muted mb-1">{{d.job_description}}</p>
             <p class="text-muted mb-1">{{d.eligibility_criteria}}</p>
             <p class="text-muted mb-1">{{d.application_deadline}}</p>
-            <form method="POST" action="{{url_for("apply_drive",drive_id=drive.id)}}">
-                <button class="btn btn-primary" {% if drive.id in applied_ids %}disabled{%endif%}>
-                    {{'Applied' if drive.id in applied_ids else 'Apply Now'}}
+            <br>
+            
+            <form method="POST" action="{{url_for("apply_drive",drive_id=d.id)}}">
+                <button class="btn btn-primary" {% if d.id in applied_ids %}disabled{%endif%}>
+                    {{'Applied' if d.id in applied_ids else 'Apply Now'}}
                 </button>
             </form>
         </div>

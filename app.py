@@ -105,7 +105,7 @@ def login():
         if user.role=='admin':
             return redirect(url_for('admin_dashboard'))
         elif user.role=='company':
-            return redirect(url_for('company_dash'))
+            return redirect(url_for('company_dashboard'))
         else:
             return redirect(url_for('student_dashboard'))
 
@@ -231,7 +231,93 @@ def blacklists(student_id):
 # companydashboard
 @app.route("/company_dashboard")
 def company_dashboard():
-    return render_template('company_dash.html')
+    if session.get('role')!="company":
+        return render_template('index.html')
+    comp=logged_in()
+    my_drives=Drive.query.filter_by(company_id=comp.id).all()
+    applications={}
+    for drive in my_drives:
+        applications[drive.id]= Application.query.filter_by(drive_id=drive.id).all()
+    return render_template('company_dash.html',
+                           company=comp,
+                           my_drives=my_drives,
+                           applications=applications)
+
+@app.route('/add_drive',methods=['GET','POST'])
+def add_drive():
+    if session.get('role')!="company":
+        return render_template('index.html')
+    comp=logged_in()
+    if comp.approval_status !="approved":
+        return redirect(url_for("company_dashboard"))
+    job_title=request.form.get('job','').strip()
+    print(job_title)
+    job_description=request.form.get('job_desc','').strip()
+    print(job_description)
+    job_eligibility=request.form.get('job_eligibility','').strip()
+    print(job_eligibility)
+    deadline=request.form.get('deadline')
+    drive=Drive(
+        company_id=comp.id,
+        job_title=job_title,
+        job_description=job_description,
+        eligibility=job_eligibility,
+        application_deadline=datetime.strptime(deadline,'%Y-%m-%d').date() if deadline else None,
+        status='approved'
+    )
+    print(drive)
+    db.session.add(drive)
+    db.session.commit()
+    return redirect(url_for("company_dashboard"))
+
+# @app.route('/company/drive/<int:drive_id>/edit',methods=['GET','POST'])
+# def edit_drive(drive_id):
+#     if session.get('role')!="company":
+#         return render_template('index.html')
+#     comp=logged_in()
+#     drive=Drive.query.get_or_404(drive_id)
+#     if drive.company_id != comp.id:
+#         return redirect(url_for("index.html"))
+#     drive.job_title=
+
+
+@app.route('/company/drive/<int:drive_id>/close',methods=['GET','POST'])
+def close_drive(drive_id):
+    if session.get('role')!="company":
+        return render_template('index.html')
+    comp=logged_in()
+    drive=Drive.query.get_or_404(drive_id)
+    if drive.company_id != comp.id:
+        return redirect(url_for("index.html"))
+    drive.status='closed'
+    db.session.commit()
+    return redirect(url_for("company_dashboard"))
+
+@app.route('/company/drive/<int:drive_id>/delete',methods=['GET','POST'])
+def delete_drive(drive_id):
+    if session.get('role')!="company":
+        return render_template('index.html')
+    comp=logged_in()
+    drive=Drive.query.get_or_404(drive_id)
+    if drive.company_id != comp.id:
+        return redirect(url_for("index.html"))
+    db.session.delete(drive)
+    db.session.commit()
+    return redirect(url_for("company_dashboard"))
+
+@app.route('/company/drive/<int:application_id>/status',methods=['GET','POST'])
+def update_application(application_id):
+    if session.get('role')!="company":
+        return render_template('index.html')
+    comp=logged_in()
+    application=Application.query.get_or_404(application_id)
+    if application.drive.company_id !=comp.id:
+        return redirect(url_for("index.html"))
+    new_status=request.form.get('status')
+    if new_status in ('Applied','selected','rejected','shortlisted'):
+        application.status=new_status
+        db.session.commit()
+    return redirect(url_for("company_dashboard")) 
 
 
 
