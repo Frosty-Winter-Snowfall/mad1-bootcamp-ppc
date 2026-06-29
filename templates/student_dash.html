@@ -2,7 +2,9 @@
 {% block title %}Student Dashboard{% endblock %}
 {% block content %}
 
-<h2>Welcome {{ student.name }}</h2>
+<h2 class="dashboard-title">
+ Welcome, {{student.name}}
+</h2>
 <div class="card p-3 mb-4">
     <form method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data">
         <div class="mb-3">
@@ -13,7 +15,7 @@
             <label class="form-label">Phone</label>
             <input type="number" name="phone" class="form-control" value="{{student.phone}}">
         </div>
-        <div class="mb-3">
+        <div class="card shadow-sm p-4 mb-5">
             <label class="form-label">Resume(PDF)</label>
             <input type="file" name="resume" class="form-control">
         </div>
@@ -28,28 +30,42 @@
 </div>
 
 <h4 class="section-title">Placement Drives</h4>
-<div class="row">
+
+<div class="row g-4">
     {% for d in approved_drives %}
-    <div class="col-md-3">
-        <div class="card p-3 h-100">
-            <h5>{{d.title}}</h5>
-            <b><p class="text-muted mb-1">{{d.job_title}}</p></b>
-            <p class="text-muted mb-1">{{d.job_description}}</p>
-            <p class="text-muted mb-1">{{d.eligibility_criteria}}</p>
-            <p class="text-muted mb-1">{{d.application_deadline}}</p>
-            <br>
-            
-            <form method="POST" action="{{url_for("apply_drive",drive_id=d.id)}}">
-                <button class="btn btn-primary" {% if d.id in applied_ids %}disabled{%endif%}>
-                    {{'Applied' if d.id in applied_ids else 'Apply Now'}}
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 p-4 border-0">
+
+            <h4 class="fw-bold text-success mb-3">
+                {{ d.job_title }}
+            </h4>
+
+            <p class="fs-5 text-secondary mb-3">
+                {{ d.job_description }}
+            </p>
+
+            <p class="fs-6 mb-2">
+                <strong>Eligibility:</strong><br>
+                {{ d.eligibility }}
+            </p>
+
+            <p class="fs-6 text-danger mb-4">
+                <strong>Application Deadline:</strong><br>
+                {{ d.application_deadline }}
+            </p>
+
+            <form method="POST" action="{{url_for('apply_drive', drive_id=d.id)}}">
+                <button class="btn btn-success w-100"
+                        {% if d.id in applied_ids %}disabled{% endif %}>
+                    {{ 'Applied ✓' if d.id in applied_ids else 'Apply Now' }}
                 </button>
             </form>
+
         </div>
     </div>
-{%else%}
-<p class="text-muted">No drrives rn</p>
-
-{% endfor %}
+    {% else %}
+    <p class="text-muted">No placement drives available right now.</p>
+    {% endfor %}
 </div>
 
 <h4 class="section-title">Placement Drives</h4>

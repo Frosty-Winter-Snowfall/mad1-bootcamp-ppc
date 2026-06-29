@@ -1,9 +1,87 @@
-body {
-    background-color:rgb(246, 246, 246);
+body{
+    background:#f4f7fb;
+    font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+}
+
+.section-title{
+    margin-top:40px;
+    margin-bottom:20px;
+    color:#198754;
+    font-weight:700;
 }
 
 .card{
     border:none;
-    box-shadow: rgb(118, 115, 115);
+    border-radius:16px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    transition:.25s;
 }
 
+.card:hover{
+    transform:translateY(-4px);
+}
+
+.btn{
+    border-radius:10px;
+}
+
+.table{
+    vertical-align:middle;
+}
+
+.table thead{
+    background:#198754;
+    color:white;
+}
+
+.table th{
+    border:none;
+}
+
+.table td{
+    vertical-align:middle;
+}
+
+.form-control,
+.form-select{
+    border-radius:10px;
+}
+
+.alert{
+    border-radius:12px;
+}
+
+.badge{
+    padding:.55rem .8rem;
+    font-size:.8rem;
+}
+
+.login-card{
+    margin-top:60px;
+}
+
+.dashboard-title{
+    font-weight:700;
+    color:#198754;
+    margin-bottom:25px;
+}
+
+.stats-card h2{
+    font-weight:700;
+}
+
+.stats-card{
+    border-radius:15px;
+}
+
+.table-responsive{
+    margin-bottom:40px;
+}
+
+h4{
+    font-weight:700;
+}
+
+hr{
+    opacity:.15;
+}

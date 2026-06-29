@@ -2,35 +2,125 @@
 {% block title %}Login{% endblock %}
 {% block content %}
 
-<h2>Admin Dashboard</h2>
+<style>
+.dashboard-title{
+    font-weight:700;
+    color:#198754;
+    margin-bottom:25px;
+}
 
+.section-title{
+    font-size:1.35rem;
+    font-weight:700;
+    color:#198754;
+    margin-top:40px;
+    margin-bottom:18px;
+    border-left:5px solid #198754;
+    padding-left:12px;
+}
 
-<!-- stats -->
-<div class="row g-3 mt-2">
+.stats-card{
+    border:none;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    transition:.25s;
+}
+
+.stats-card:hover{
+    transform:translateY(-4px);
+}
+
+.stats-card h6{
+    font-size:1rem;
+    opacity:.9;
+    margin-bottom:10px;
+}
+
+.stats-card h2{
+    font-size:2.2rem;
+    font-weight:700;
+}
+
+.table{
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+}
+
+.table thead{
+    background:#198754;
+    color:white;
+}
+
+.table th{
+    padding:15px;
+    vertical-align:middle;
+}
+
+.table td{
+    padding:14px;
+    vertical-align:middle;
+}
+
+.btn{
+    border-radius:10px;
+    font-weight:500;
+}
+
+.search-box{
+    max-width:450px;
+}
+
+.search-box input{
+    border-radius:10px;
+}
+
+.search-box button{
+    border-radius:10px;
+}
+
+.card{
+    border:none;
+    border-radius:15px;
+}
+
+.table-responsive{
+    margin-bottom:25px;
+}
+</style>
+
+<h2 class="dashboard-title">Admin Dashboard</h2>
+
+<div class="row g-4 mb-4">
+
     <div class="col-md-3">
-        <div class="card text-bg-primary p-3">
-    <h6>Total Students</h6>
-    <h2>{{total_students}}</h2>
-</div>
-</div>
+        <div class="card stats-card bg-primary text-white text-center p-4">
+            <h6>Total Students</h6>
+            <h2>{{total_students}}</h2>
+        </div>
+    </div>
+
     <div class="col-md-3">
-        <div class="card text-bg-success p-3">
-    <h6>Company</h6>
-    <h2>{{total_companies}}</h2>
-</div>
-</div>
+        <div class="card stats-card bg-success text-white text-center p-4">
+            <h6>Total Companies</h6>
+            <h2>{{total_companies}}</h2>
+        </div>
+    </div>
+
     <div class="col-md-3">
-        <div class="card text-bg-warning p-3">
-    <h6>Placement</h6>
-    <h2>{{total_place}}</h2>
-</div>
-</div>
+        <div class="card stats-card bg-warning text-dark text-center p-4">
+            <h6>Placement Drives</h6>
+            <h2>{{total_place}}</h2>
+        </div>
+    </div>
+
     <div class="col-md-3">
-        <div class="card text-bg-danger p-3">
-    <h6>Applications</h6>
-    <h2>{{total_app}}</h2>
-</div>
-</div>
+        <div class="card stats-card bg-danger text-white text-center p-4">
+            <h6>Applications</h6>
+            <h2>{{total_app}}</h2>
+        </div>
+    </div>
+
 </div>
 
 
@@ -95,9 +185,11 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td>
-                No pending approvals
-            </td></tr>
+            <tr>
+    <td colspan="3" class="text-center text-muted">
+        No pending approvals
+    </td>
+</tr>
             {% endfor %}
         </tbody>
     </table>
@@ -105,15 +197,21 @@
 
 
 <h4 class="section-title">Search</h4>
-<form method="GET" class="d-flex mb-3" style="max-width:400px;">
-    <input type="text" name="q" class="form-control me-2" placeholder="Search by name/id" value="{{search_query}}">
-    <button class="btn btn-success">Search</button>
+<form method="GET" class="d-flex search-box mb-4">
+    <input type="text"
+           name="q"
+           class="form-control me-2"
+           placeholder="Search students or companies..."
+           value="{{search_query}}">
+    <button class="btn btn-success px-4">
+        Search
+    </button>
 </form>
 
 {% if search_query %}
 <p class="text-muted">Results for "{{ search_query }}"</p>
 <div class="table-responsive">
-    <table class="table table-bordered bg-light">
+    <table class="table table-hover align-middle bg-white">
         <thead>
             <tr>
                 <th>Name</th>
@@ -148,7 +246,7 @@
 <!-- all students -->
 <h4 class="section-title">All Students</h4>
 <div class="table-responsive">
-    <table class="table table-bordered bg-light">
+    <table class="table table-hover align-middle bg-white">
         <thead>
             <tr>
                 <th>Name</th>
@@ -170,7 +268,11 @@
                 </td>
             </tr>
             {% else %}
-            <tr>No students</tr>
+            <tr>
+    <td colspan="3" class="text-center text-muted">
+        No students found.
+    </td>
+</tr>
             {% endfor %}
         </tbody>
 </table>
@@ -181,7 +283,7 @@
 <!-- companies -->
 <h4 class="section-title">All Companies</h4>
 <div class="table-responsive">
-    <table class="table table-bordered bg-light">
+    <table class="table table-hover align-middle bg-white">
         <thead>
             <tr>
                 <th>Name</th>
@@ -208,7 +310,7 @@
 
 <h4 class="section-title">All Drives</h4>
 <div class="table-responsive">
-    <table class="table table-bordered bg-light">
+    <table class="table table-hover align-middle bg-white">
         <thead>
             <tr>
                 <th>Company Name</th>
@@ -225,7 +327,11 @@
                 <td>{{s.application_deadline}}</td>
             </tr>
             {% else %}
-            <tr>No Drives</tr>
+            <tr>
+    <td colspan="3" class="text-center text-muted">
+        No drives available.
+    </td>
+</tr>
             {% endfor %}
         </tbody>
 </table>

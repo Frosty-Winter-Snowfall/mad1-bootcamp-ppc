@@ -1,16 +1,84 @@
 {% extends 'base.html' %}
-{% block title %}Landing Page{% endblock %}
+{% block title %}Placement Portal Cell{% endblock %}
+
 {% block content %}
 
-<div class="p-5 mb-4 bg-light rounded-3 text center">
-    <h1 class="display-5 fw-bold">Placement Portal</h1>
-    <p class="fs-5 col-md-8 mx-auto">
-        Actual text resxdtyvbibiudsgviuwbeasdowias
-        ufgaduybwiabdowi
+<div class="p-5 mb-5 bg-white rounded-4 shadow-sm text-center">
+
+    <h1 class="display-4 fw-bold text-success">
+        Placement Portal Cell
+    </h1>
+
+    <p class="lead text-muted mx-auto" style="max-width:700px;">
+        A centralized platform that connects students, recruiters and institute administrators,
+        making placement management simple, transparent and efficient.
     </p>
 
-    <a href="{{ url_for("signup") }}" class="btn btn-primary btn-lg me-2">Get Started</a>
-    <a href="{{ url_for("login") }}" class="btn btn-primary btn-lg me-2">Sign in</a>
+    <div class="mt-4">
+        <a href="{{ url_for('signup') }}" class="btn btn-success btn-lg px-4 me-2">
+            Get Started
+        </a>
+
+        <a href="{{ url_for('login') }}" class="btn btn-outline-success btn-lg px-4">
+            Sign In
+        </a>
+    </div>
+
+</div>
+
+<div class="row g-4 text-center">
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="display-5 mb-3">🎓</div>
+
+                <h5 class="fw-bold">
+                    Students
+                </h5>
+
+                <p class="text-muted">
+                    Browse approved placement drives, apply to companies,
+                    upload resumes and track application status.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="display-5 mb-3">🏢</div>
+
+                <h5 class="fw-bold">
+                    Companies
+                </h5>
+
+                <p class="text-muted">
+                    Register your company, publish placement drives,
+                    review applications and shortlist candidates.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="display-5 mb-3">🛠️</div>
+
+                <h5 class="fw-bold">
+                    Admin
+                </h5>
+
+                <p class="text-muted">
+                    Approve companies, manage placement drives,
+                    oversee applications and maintain portal records.
+                </p>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}

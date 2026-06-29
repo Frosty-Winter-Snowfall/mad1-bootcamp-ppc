@@ -4,9 +4,11 @@
 
 <div class="row justify-content-center">
     <div class="col-md-6">
-    <div class="card p-4">
+    <div class="card login-card p-5 shadow-sm">
     
-    <h3 class="mb-3">Create Account</h3>
+    <h3 class="text-center mb-4">
+Create an Account
+</h3>
 
     {% if error %}
     <div class="alert alert-danger">{{error}}</div>
@@ -57,7 +59,7 @@
             <div class="form-text mb-3"> You will be able to signin only after admin approves          
             </div>
         </div>
-        <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+        <button type="submit" class="btn btn-success w-100">Sign Up</button>
     </form>
     </div>
     </div>

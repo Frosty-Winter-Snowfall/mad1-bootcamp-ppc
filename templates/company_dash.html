@@ -2,108 +2,380 @@
 {% block title %}Company Dashboard{% endblock %}
 {% block content %}
 
-<h2>Welcome {{ company.company_name }}</h2>
+<style>
+.dashboard-title{
+    font-weight:700;
+    color:#198754;
+    margin-bottom:25px;
+}
+
+.section-title{
+    font-size:1.35rem;
+    font-weight:700;
+    color:#198754;
+    border-left:5px solid #198754;
+    padding-left:12px;
+    margin-top:40px;
+    margin-bottom:20px;
+}
+
+.portal-card{
+    border:none;
+    border-radius:16px;
+    box-shadow:0 8px 22px rgba(0,0,0,.08);
+    transition:.25s;
+}
+
+.portal-card:hover{
+    transform:translateY(-3px);
+}
+
+.table{
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.table thead{
+    background:#198754;
+    color:white;
+}
+
+.table th,
+.table td{
+    vertical-align:middle;
+    padding:14px;
+}
+
+.btn{
+    border-radius:10px;
+    transition:.25s;
+}
+
+.btn-outline-success:hover,
+.btn-outline-danger:hover,
+.btn-outline-warning:hover,
+.btn-outline-primary:hover{
+    color:#fff;
+}
+
+.badge{
+    font-size:.85rem;
+    padding:.6em .9em;
+}
+
+.drive-title{
+    font-size:1.4rem;
+    font-weight:700;
+    color:#198754;
+}
+
+.drive-desc{
+    font-size:1rem;
+    color:#666;
+}
+
+.drive-info{
+    font-size:.95rem;
+}
+
+.form-control{
+    border-radius:10px;
+}
+
+.form-select{
+    border-radius:10px;
+}
+</style>
+
+<h2 class="dashboard-title">
+    Welcome, {{ company.company_name }}
+</h2>
+
 {% if company.approval_status!='approved' %}
-<div class="alert alert-warning">
-    You are not approved yet
+
+<div class="alert alert-warning rounded-3">
+    <strong>Your company is awaiting admin approval.</strong>
+    You can create drives now, but students won't see them until approval.
 </div>
 {% endif %}
 
-<h4 class="section-title">Create a Placement/Drive</h4>
-<div class="card p-3 mb-4">
-    <form method="POST" action="{{url_for('add_drive')}}">
-        <div class="row g-2">
-            <div class="col md-4">
-                <input type="text" name="job" class="form-control" placeholder="Job Title" required>           
-            </div>
-             <div class="col md-4">
-                <input type="text" name="job_desc" class="form-control" placeholder="Job Description">
-            </div>
-            <div class="col md-4">
-                <input type="text" name="job_eligibility" class="form-control" placeholder="Job Eligibility">
-            </div>
-             <div class="col md-4">
-                <input type="date" name="deadline" class="form-control" placeholder="Application Deadline">
-            </div>
-            <div class="col md-4">
-                <button class="btn btn-success w 100">Add Placement</button>
-            </div>
-        </div>
-    </form>
+<h4 class="section-title">
+Create Placement Drive
+</h4>
+
+<div class="card portal-card p-4 mb-5">
+
+<form method="POST" action="{{url_for('add_drive')}}">
+
+<div class="row g-3">
+
+<div class="col-md-6">
+<input
+type="text"
+name="job"
+class="form-control"
+placeholder="Job Title"
+required>
 </div>
 
-<h4 class="section-title">My placement Drives</h4>
+<div class="col-md-6">
+<input
+type="date"
+name="deadline"
+class="form-control">
+</div>
+
+<div class="col-md-12">
+<input
+type="text"
+name="job_desc"
+class="form-control"
+placeholder="Job Description">
+</div>
+
+<div class="col-md-12">
+<input
+type="text"
+name="job_eligibility"
+class="form-control"
+placeholder="Eligibility Criteria">
+</div>
+
+<div class="col-md-12">
+<button class="btn btn-success px-4">
+Add Placement Drive
+</button>
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+<h4 class="section-title">
+My Placement Drives
+</h4>
+
 {% for drive in my_drives %}
-<div class="card p-3 mb-4">
-    <div class="d-flex justify-content-between align-items-start">
-        <h5>{{drive.job_title}}</h5>
-        <p class="text-muted mb-1">{{drive.job_description}}</p>
-        <p class="text-muted mb-1">{{drive.eligibility}}</p>
-        <p class="text-muted mb-1">{{drive.application_deadline}}</p>
-    </div>
-    <div class="text-nowrap">
-        {% if drive.status!='Closed' %}
-        <form method="POST" action="{{ url_for('close_drive',drive_id=drive.id) }}" class="d-inline">
-            <button class="btn btn-sm btn-outline-warning">Close</button>
-        </form>
-        {% endif %}
-        <form method="POST" action="{{url_for('delete_drive',drive_id=drive.id)}}" class="d-inline">
-            <button class="btn btn-sm btn-outline-danger">Delete</button>
-        </form>
-    </div>
 
-    <hr>
-    <h6>Applicants ({{applications[drive.id] | length}})</h6>
-    
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Email</th>
-                    <th>Resume</th>
-                    <th>Status</th>
-                    <th>Update</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for app in applications[drive.id] %}
-                <tr>
-                    <td>{{app.student.name}}</td>
-                    <td>{{app.student.email}}</td>
-                    <td>
-                        {% if app.student.resume_path %}
-                        <a href="{{url_for('uploded_file',filename=app.student.resume_path)}}">View</a>
-                        {% else %}
-                        <p>No resume</p>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="badge {% if app.status=='selected' %}bg-success{% elif app.status=='shortlisted' %}bg-warning{% elif app.status=='rejected' %}bg-danger{% else %}bg-primary{% endif %}">
-                            {{app.status}}
-                        </span>
-                    </td>
-                    <td>
-                        <form method="POST" action="{{url_for("update_application",application_id=app.id)}}">
-                            <select name="status" class="form-select-sm-me-2">
-                                {% for s in ['Applied','selected','rejected','shortlisted'] %}
-                                <option value="{{s}}" {% if app.status ==s %}selected{% endif %}>
-                                    {{s}}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <button class="btn btn-success">Save</button>
-                        </form>
-                    </td>
-                </tr>
-               {% endfor %}
-               
-            </tbody>
-        </table>
-    </div>
+<div class="card portal-card p-4 mb-5">
 
-    
- {% endfor %}
+<div class="d-flex justify-content-between align-items-start flex-wrap">
 
+<div>
+
+<h4 class="drive-title">
+{{drive.job_title}}
+</h4>
+
+<p class="drive-desc mt-2">
+{{drive.job_description}}
+</p>
+
+<p class="drive-info mb-1">
+<strong>Eligibility:</strong>
+{{drive.eligibility}}
+</p>
+
+<p class="drive-info text-danger">
+<strong>Application Deadline:</strong>
+{{drive.application_deadline}}
+</p>
+
+</div>
+
+<div class="mt-2">
+
+{% if drive.status!='Closed' %}
+
+<form
+method="POST"
+action="{{ url_for('close_drive',drive_id=drive.id) }}"
+class="d-inline">
+
+<button class="btn btn-outline-warning me-2">
+Close
+</button>
+
+</form>
+{% endif %}
+
+<form
+method="POST"
+action="{{url_for('delete_drive',drive_id=drive.id)}}"
+class="d-inline">
+
+<button class="btn btn-outline-danger">
+Delete
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<hr>
+
+<h5 class="fw-bold mb-3">
+Applicants ({{applications[drive.id] | length}})
+</h5>
+
+<div class="table-responsive">
+
+<table class="table table-hover align-middle">
+
+<thead>
+
+<tr>
+
+<th>Student</th>
+
+<th>Email</th>
+
+<th>Resume</th>
+
+<th>Status</th>
+
+<th>Update</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for app in applications[drive.id] %}
+
+<tr>
+
+<td>
+{{app.student.name}}
+</td>
+
+<td>
+{{app.student.email}}
+</td>
+
+<td>
+
+{% if app.student.resume_path %}
+
+<a
+href="{{url_for('uploded_file',filename=app.student.resume_path)}}"
+class="btn btn-outline-primary btn-sm">
+
+View Resume
+
+</a>
+
+{% else %}
+
+<span class="text-muted">
+No Resume
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+<span
+class="badge
+
+{% if app.status=='selected' %}
+bg-success
+
+{% elif app.status=='shortlisted' %}
+bg-warning text-dark
+
+{% elif app.status=='rejected' %}
+bg-danger
+
+{% else %}
+bg-primary
+
+{% endif %}
+
+">
+
+{{app.status}}
+
+</span>
+
+</td>
+
+<td>
+
+<form
+method="POST"
+action="{{url_for('update_application',application_id=app.id)}}"
+class="d-flex">
+
+<select
+name="status"
+class="form-select me-2">
+
+{% for s in ['Applied','selected','shortlisted','rejected'] %}
+
+<option
+value="{{s}}"
+{% if app.status==s %}selected{% endif %}>
+
+{{s}}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+<button class="btn btn-outline-success">
+
+Save
+
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+{% else %}
+
+<tr>
+
+<td colspan="5" class="text-center text-muted">
+
+No applicants yet.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+{% else %}
+
+<div class="card portal-card p-5 text-center">
+
+<h5 class="text-muted">
+You haven't created any placement drives yet.
+</h5>
+
+</div>
+
+{% endfor %}
 
 {% endblock %}
