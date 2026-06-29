@@ -172,7 +172,7 @@
         <tbody>
             {% for c in pending_drive %}
             <tr>
-                <td>{{c.job_title}}</td>
+                <td>{{c.drive.job_title}}</td>
                 <td>{{c.company.company_name}}</td>
                 <td>{{c.application_deadline}}</td>
                 <td>
@@ -315,16 +315,18 @@
             <tr>
                 <th>Company Name</th>
                 <th>Job Title</th>
-                <th>Application Deadline</th>      
+                <th>Application Deadline</th>  
+                <th>Status</th>     
             </tr>
         </thead>
         <tbody>
             {% for s in all_drives %}
             <tr>
-                <td>{{s.name}}</td>
+                <td>{{s.company.name}}</td>
                 <td>{{s.job_title}}</td>
                 <!-- <td>{{s.name}}</td> -->
                 <td>{{s.application_deadline}}</td>
+                <td><button class="btn btn-outline-success">{{s.status}}</button></td>
             </tr>
             {% else %}
             <tr>

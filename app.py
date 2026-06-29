@@ -161,9 +161,10 @@ def admin_dashboard():
 
 
     pending_comp=User.query.filter_by(role="company",approval_status='pending').all()
+    pending_drive=User.query.filter_by(approval_status='approved').all()
     all_students=User.query.filter_by(role="student").all()
     all_companies=User.query.filter_by(role="company").all()
-    all_drives=User.query.filter_by(role="company").all()
+    all_drives=Drive.query.filter_by(status="approved").all()
 
     search_query=request.args.get('q','').strip()
     search_results_stud=[]

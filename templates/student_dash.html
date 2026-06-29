@@ -88,7 +88,7 @@
                 <td>{{a.drive.company.company_name}}</td>
                 <td>{{a.application_date}}</td>
                 <td>
-                    <span class="badge {% if a.status=='Selected' %}bg-success{%elif a.status=='Rejected' %}bg-danger{% elif a.status=='Shortlisted' %}bg-warning{% else %}bg-secondary{%endif%}">{{a.status}}</span></td>
+                    <span class="badge {% if a.status=='Selected' %}bg-success{%elif a.status=='Rejected' %}bg-danger{% elif a.status=='Shortlisted' %}bg-warning{% else %}bg-primary{%endif%}">{{a.status}}</span></td>
                     
             </tr>
             {% else %}
